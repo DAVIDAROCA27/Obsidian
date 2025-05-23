@@ -1,0 +1,74 @@
+## Alternative Web File Transfer Method
+
+Since Linux distributions usually have `Python` or `php` installed, starting a web server to transfer files is straightforward. Also, if the server we compromised is a web server, we can move the files we want to transfer to the web server directory and access them from the web page, which means that we are downloading the file from our Pwnbox.
+
+It is possible to stand up a web server using various languages. A compromised Linux machine may not have a web server installed. In such cases, we can use a mini web server. What they perhaps lack in security, they make up for flexibility, as the webroot location and listening ports can quickly be changed.
+
+#### Linux - Creating a Web Server with Python3
+
+```shell-session
+pepedavidphone@htb[/htb]$ python3 -m http.server
+
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+```
+
+#### Linux - Creating a Web Server with Python2.7
+
+```shell-session
+pepedavidphone@htb[/htb]$ python2.7 -m SimpleHTTPServer
+
+Serving HTTP on 0.0.0.0 port 8000 (http://0.0.0.0:8000/) ...
+```
+
+#### Linux - Creating a Web Server with PHP
+
+```shell-session
+pepedavidphone@htb[/htb]$ php -S 0.0.0.0:8000
+
+[Fri May 20 08:16:47 2022] PHP 7.4.28 Development Server (http://0.0.0.0:8000) started
+```
+
+#### Linux - Creating a Web Server with Ruby
+
+```shell-session
+pepedavidphone@htb[/htb]$ ruby -run -ehttpd . -p8000
+
+[2022-05-23 09:35:46] INFO  WEBrick 1.6.1
+[2022-05-23 09:35:46] INFO  ruby 2.7.4 (2021-07-07) [x86_64-linux-gnu]
+[2022-05-23 09:35:46] INFO  WEBrick::HTTPServer#start: pid=1705 port=8000
+```
+
+#### Download the File from the Target Machine onto the Pwnbox
+
+```shell-session
+pepedavidphone@htb[/htb]$ wget 192.168.49.128:8000/filetotransfer.txt
+
+--2022-05-20 08:13:05--  http://192.168.49.128:8000/filetotransfer.txt
+Connecting to 192.168.49.128:8000... connected.
+HTTP request sent, awaiting response... 200 OK
+Length: 0 [text/plain]
+Saving to: 'filetotransfer.txt'
+
+filetotransfer.txt                       [ <=>                                                                  ]       0  --.-KB/s    in 0s      
+
+2022-05-20 08:13:05 (0.00 B/s) - ‘filetotransfer.txt’ saved [0/0]
+```
+
+**Note:** When we start a new web server using Python or PHP, it's important to consider that inbound traffic may be blocked. We are transferring a file from our target onto our attack host, but we are not uploading the file.
+
+---
+
+## SCP Upload
+
+We may find some companies that allow the `SSH protocol` (TCP/22) for outbound connections, and if that's the case, we can use an SSH server with the `scp` utility to upload files. Let's attempt to upload a file to the target machine using the SSH protocol.
+
+#### File Upload using SCP
+
+```shell-session
+pepedavidphone@htb[/htb]$ scp /etc/passwd htb-student@10.129.86.90:/home/htb-student/
+
+htb-student@10.129.86.90's password: 
+passwd                                                                                                           100% 3414     6.7MB/s   00:00
+```
+
+**Note:** Remember that scp syntax is similar to cp or copy.

