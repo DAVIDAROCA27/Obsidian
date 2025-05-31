@@ -1,0 +1,5 @@
+sudo tymedatectl set-ntp false #desactivar_el_sincronizador_automatico_para_evitar_conflictos_
+
+sudo ntpdate (IP) #sincronizar_con_el_DC_manualmente
+date #Verifica_que_haya_cambiado_la_fecha
+sudi timedatectl set-ntp true #Reactivar_sincronizacion_automatica(opcional)
